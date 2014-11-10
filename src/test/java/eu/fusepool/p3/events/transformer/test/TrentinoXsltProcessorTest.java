@@ -42,18 +42,19 @@ public class TrentinoXsltProcessorTest {
 		String xmlUrl = getClass().getResource("foo.xml").getFile();
 		String xsltUrl = getClass().getResource("foo.xsl").getFile();
 		InputStream rdfIn = processor.processXml(xsltUrl, xmlUrl);
-		
+		StringBuilder text = new StringBuilder();
 		try {
 	        BufferedReader reader = new BufferedReader(new InputStreamReader(rdfIn));
 	        String line;
 	        while((line = reader.readLine()) != null){
-	            log.debug(line);
+	        	text.append(line);
 	        }	
     	}
     	catch(IOException ioe){
     		
     	}
 		
+		Assert.assertTrue(text.toString().contains("Hello"));
 		//Graph graph = Parser.getInstance().parse(rdfIn, SupportedFormat.TURTLE);
 		
 	}
