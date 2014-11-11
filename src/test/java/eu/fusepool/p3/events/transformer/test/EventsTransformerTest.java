@@ -12,14 +12,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import com.jayway.restassured.RestAssured;
-
 import eu.fusepool.p3.events.transformer.EventsTransformerFactory;
 import eu.fusepool.p3.transformer.server.TransformerServer;
-
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import eu.fusepool.p3.transformer.client.Transformer;
 import eu.fusepool.p3.transformer.client.TransformerClientImpl;
@@ -51,22 +47,28 @@ import org.apache.clerezza.rdf.ontologies.RDFS;
 import org.apache.clerezza.rdf.ontologies.XSD;
 import org.apache.clerezza.rdf.utils.GraphNode;
 import org.junit.Rule;
+import org.slf4j.LoggerFactory;
 
 public class EventsTransformerTest {
 	
 	private static final UriRef LONG = new UriRef("http://www.w3.org/2003/01/geo/wgs84_pos#long");
     private static final UriRef LAT = new UriRef("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
 	
+	// client data (xml)
+	final String CLIENT_XML_DATA = "foo.xml";
 	// data used by the mock server
-	final String MOCK_SERVER_DATA = "eventi-visittrentino.xml";
-	public static final String DATA_MIME_TYPE = "application/xml"; //MIME type of the data fetched from the url provided by the client
+	final String MOCK_XSLT = "foo.xsl";
+	
+	public static final String DATA_MIME_TYPE = "application/xml"; //MIME type of the xslt file fetched from the url provided by the client
 	
 	final static String TRANSFORMER_MIME_TYPE = "text/turtle";
 	
     private static MimeType transformerMimeType;
+    private static MimeType clientDataMimeType;
     static {
         try {
         	transformerMimeType = new MimeType(TRANSFORMER_MIME_TYPE);
+        	clientDataMimeType = new MimeType(DATA_MIME_TYPE);
         } catch (MimeTypeParseException ex) {
             Logger.getLogger(EventsTransformerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -74,7 +76,8 @@ public class EventsTransformerTest {
     
 	private static int mockPort = 0;
 	private int transformerServerPort = 0;
-    private byte[] mockServerDataSet;
+    private byte[] mockXslt;
+    private byte[] clientXmlData;
     private String transformerBaseUri;
 	
 	
@@ -87,8 +90,10 @@ public class EventsTransformerTest {
 	
 	@Before
     public void setUp() throws Exception {
-		// load the data for the mock server
-		mockServerDataSet = IOUtils.toByteArray(getClass().getResourceAsStream(MOCK_SERVER_DATA));
+		//load the client xml data
+		clientXmlData = IOUtils.toByteArray(getClass().getResourceAsStream(CLIENT_XML_DATA));
+		// load the xslt transformation
+		mockXslt = IOUtils.toByteArray(getClass().getResourceAsStream(MOCK_XSLT));
 		
 		// set up the transformer
 		transformerServerPort = findFreePort();
@@ -126,50 +131,44 @@ public class EventsTransformerTest {
 	@Test
     public void testTransformation() throws Exception {
 	    // Set up a service in the mock server to respond to a get request that must be sent by the transformer
-		// on behalf of its client to fetch the data.
-        stubFor(get(urlEqualTo("/data/" + MOCK_SERVER_DATA))
+		// on behalf of its client to fetch the xslt.
+        stubFor(get(urlEqualTo("/xslt/" + MOCK_XSLT))
                 .willReturn(aResponse()
                     .withStatus(HttpStatus.SC_OK)
-                    .withHeader("Content-Type", DATA_MIME_TYPE)
-                    .withBody(mockServerDataSet)));
+                    .withHeader("Content-Type", "application/xml")
+                    .withBody(mockXslt)));
         
-        // prepare the client data with a position and dates to lookup events
-        final MGraph graphToEnrich = new SimpleMGraph();
-        final UriRef res1 = new UriRef("http://example.org/res1");
-        final GraphNode node1 = new GraphNode(res1, graphToEnrich);
-        node1.addProperty(LAT, new TypedLiteralImpl("46.222037", XSD.double_));
-        node1.addProperty(LONG, new TypedLiteralImpl("10.796313", XSD.double_));
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Serializer.getInstance().serialize(baos, graphToEnrich, "text/turtle");
-        final byte[] ttlData = baos.toByteArray();
-        String dataUrl = "http://localhost:" + mockPort + "/data/" + MOCK_SERVER_DATA ;
+        // prepare the client HTTP POST message with the xml data and the url where to dereference the xslt 
+        String xsltUrl = "http://localhost:" + mockPort + "/xslt/" + MOCK_XSLT ;
         // the client sends a request to the transformer with the url of the events data to be fetched
-        String clientRequestUrl = RestAssured.baseURI+"?data="+URLEncoder.encode(dataUrl, "UTF-8");
+        String queryString = "xslt=" + URLEncoder.encode(xsltUrl, "UTF-8");
+        String clientRequestUrl = RestAssured.baseURI+"?"+queryString;
         Transformer t = new TransformerClientImpl(clientRequestUrl);
-        // the transformer fetches the data from the mock server, applies its transformation and sends the RDF result to the client
+        // the transformer fetches the xslt from the mock server, applies its transformation and sends the RDF result to the client
         {
             Entity response = t.transform(new WritingEntity() {
 
                 @Override
                 public MimeType getType() {
-                    return transformerMimeType;
+                    return clientDataMimeType;
                 }
 
                 @Override
                 public void writeData(OutputStream out) throws IOException {
-                    out.write(ttlData);
+                    out.write(clientXmlData);
                 }
             }, transformerMimeType);
 
             // the client receives the response from the transformer
-            Assert.assertEquals("Wrong media Type of response", transformerMimeType.toString(), response.getType().toString());            
-            
+            Assert.assertEquals("Wrong media Type of response", transformerMimeType.toString(), response.getType().toString());  
+            // Parse the RDF data returned by the transformer after the xslt transformation has been applied to the xml data
             final Graph responseGraph = Parser.getInstance().parse(response.getData(), "text/turtle");
             //checks for the presence of a specific property added by the transformer
-            final Iterator<Triple> propertyIter = responseGraph.filter(res1, FOAF.based_near, null);
-            Assert.assertTrue("No specific property on res1 in response", propertyIter.hasNext());
-            //verify that the data has been loaded from the (mock) server (one call)
-            verify(1,getRequestedFor(urlEqualTo("/data/" + MOCK_SERVER_DATA)));
+            final Iterator<Triple> propertyIter = responseGraph.filter(null, RDFS.label, null);
+            Assert.assertTrue("No specific property found in response", propertyIter.hasNext());
+            //verify that the xslt has been loaded from the (mock) server (one call)
+            //verify(1,getRequestedFor(urlEqualTo("/xslt/" + MOCK_XSLT)));
+            
         }
                 
 	    

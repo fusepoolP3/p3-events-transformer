@@ -21,9 +21,9 @@ import org.xml.sax.InputSource;
  *
  */
 
-public class TrentinoXsltProcessor implements XsltProcessor {
+public class XsltProcessorImpl implements XsltProcessor {
 	
-	public InputStream processXml(String xsltUrl, String xmlUrl) throws TransformerException, TransformerConfigurationException, 
+	public InputStream processXml(String xsltUrl, InputStream xmlDataIn) throws TransformerException, TransformerConfigurationException, 
 	FileNotFoundException, IOException {
 		
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -32,7 +32,7 @@ public class TrentinoXsltProcessor implements XsltProcessor {
 		
 		Transformer transformer = tFactory.newTransformer(new StreamSource( xsltUrl ));
 		
-		transformer.transform(new StreamSource( xmlUrl ), new StreamResult( outputStream ));
+		transformer.transform(new StreamSource( xmlDataIn ), new StreamResult( outputStream ));
 		
 		return new ByteArrayInputStream(outputStream.toByteArray());
 	}

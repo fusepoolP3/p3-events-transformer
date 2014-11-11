@@ -27,6 +27,8 @@ import java.util.Set;
 
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.apache.clerezza.rdf.core.MGraph;
 import org.apache.clerezza.rdf.core.TripleCollection;
@@ -57,13 +59,13 @@ class EventsTransformer extends RdfGeneratingTransformer {
 	
     private static final Logger log = LoggerFactory.getLogger(EventsTransformer.class);
     
-    final ExampleEnricher exampleEnricher;
-    final String dataUrl;
-
-    EventsTransformer(ExampleEnricher exampleEnricher, String dataUrl) {
-        this.exampleEnricher = exampleEnricher;
-        this.dataUrl = dataUrl;
-    }
+    final XsltProcessor processor; 
+    final String xsltUrl;
+    
+    EventsTransformer(XsltProcessor processor, String xsltUrl) {
+    	this.processor = processor;
+    	this.xsltUrl = xsltUrl;
+    	}
 
     @Override
     public Set<MimeType> getSupportedInputFormats() {
@@ -80,38 +82,53 @@ class EventsTransformer extends RdfGeneratingTransformer {
     }
 
     /**
-     * Takes from the client RDF data with a location and dates and a URL to fetch events nearby.
-     * Returns the original RDF data with the events information.    
+     * Takes from the client an XML data set about events (places and dates)  a URL to dereference
+     * the XSLT rules to transform it in RDF.
+     * Returns the result RDF data    
      */
     @Override
     protected TripleCollection generateRdf(HttpRequestEntity entity) throws IOException {
-    	TripleCollection resultGraph = new SimpleMGraph();
-        String mediaType = entity.getType().toString();   
-        Parser parser = Parser.getInstance();
-        TripleCollection clientGraph = parser.parse( entity.getData(), mediaType);
+    	TripleCollection resultGraph = null;
+        String mediaType = entity.getType().toString();
+        log.debug(mediaType);
+        InputStream xmlDataIn = entity.getData();
         
-        // add the client data to the result graph
-        resultGraph.addAll(clientGraph);
-        
-        // graph containing the data feched by the url if provided.
-        TripleCollection dataGraph = null;
-        
-        // Fetch the events from the url.
-    	// The data url must be specified as a query parameter
-    	log.info("Data Url : " + dataUrl);
-    	if(dataUrl != null){
-    		
-    		// enrich the client data using the data fetched from the url
-    		if( (dataGraph = fetchDataFromUrl(dataUrl) ) != null ){
-               resultGraph.addAll(dataGraph);    
+        // Fetch the xslt transformation from the url.
+    	// The xslt transformation url must be specified as a query parameters
+    	log.info("XSLT Url : " + xsltUrl);
+    	if( xmlDataIn != null ){
+    		// transform the xml data using the xslt fetched from the url
+    		if( xsltUrl != null ){
+    			fetchXslt(xsltUrl);
+    			try {
+    			  InputStream rdfDataIn = processor.processXml(xsltUrl, xmlDataIn);
+    			  resultGraph = Parser.getInstance().parse(rdfDataIn, SupportedFormat.TURTLE);
+    			  try {
+    	    	        BufferedReader reader = new BufferedReader(new InputStreamReader(rdfDataIn));
+    	    	        String line;
+    	    	        while((line = reader.readLine()) != null){
+    	    	            System.out.println(line);
+    	    	        }	
+    	        	}
+    	        	catch(IOException ioe){
+    	        		throw new RuntimeException(ioe.getMessage());
+    	        	}
+    			}
+    			catch(TransformerConfigurationException tce){
+    				throw new RuntimeException(tce.getMessage());
+    			} 
+    			catch (TransformerException te) {				
+					throw new RuntimeException(te.getMessage());
+				}
+                
+    			
     		}
     		else {
-    			throw new RuntimeException("Failed to transform the events source data.");
-    		}
-    		
+    			throw new IllegalArgumentException("A url to fetch the xslt rules must be provided.");    			
+    		}    		
     	}
     	else {
-    		throw new IllegalArgumentException("A url to fetch the data must be provided.");
+    		throw new RuntimeException("No XML data to transform.");
     	}
     	
         
@@ -126,12 +143,35 @@ class EventsTransformer extends RdfGeneratingTransformer {
      * @param dataUrl
      * @return
      * @throws IOException
+     * @throws TransformerException 
+     * @throws TransformerConfigurationException 
      */
-    private TripleCollection fetchDataFromUrl(String dataUrl)throws IOException {
+    private TripleCollection fetchDataFromUrl(String dataUrl) throws IOException {
     	TripleCollection rdfData = null;
         URL sourceUrl = new URL(dataUrl);
         URLConnection connection = sourceUrl.openConnection();
         InputStream in =  connection.getInputStream();
+        
+        //XsltProcessor processor = new TrentinoXsltProcessor();
+        
+        //String xsltUrl = getClass().getResource("foo.xsl").getFile();
+        
+        /*
+        
+        try {
+        
+           processor.processXml(xsltUrl, dataUrl);
+        
+        }
+        catch(TransformerConfigurationException tce){
+        	throw new RuntimeException("An error has been found in " + xsltUrl);
+        	
+        }
+        catch(TransformerException te){
+        	throw new RuntimeException("An error has been found in " + xsltUrl);
+        }
+        
+        */
         
         printIntupStream(in);
         
@@ -148,6 +188,15 @@ class EventsTransformer extends RdfGeneratingTransformer {
         
         
         return rdfData;
+    	
+    }
+    
+    private void fetchXslt(String url) throws IOException {
+    	
+    	URL xsltUrl = new URL(url);
+        URLConnection connection = xsltUrl.openConnection();
+        InputStream in =  connection.getInputStream();
+        printIntupStream(in);
     	
     }
     

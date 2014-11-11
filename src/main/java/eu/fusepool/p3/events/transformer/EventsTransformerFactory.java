@@ -21,24 +21,24 @@ public class EventsTransformerFactory implements TransformerFactory {
 
     private final Map<String, Transformer> data2Transformer = 
             new HashMap<>();
-    private final ExampleEnricher dataEnricher;
+    private final XsltProcessor processor;
 
     public EventsTransformerFactory() throws IOException {
-        this.dataEnricher = new ExampleEnricher();
+        this.processor = new XsltProcessorImpl();
     }
     
     @Override
     public Transformer getTransformer(HttpServletRequest request) {
-        final String dataUri = request.getParameter("data");
-        return getTransfomerFor(dataUri);
+        final String xsltUri = request.getParameter("xslt");
+        return getTransfomerFor(xsltUri);
     }
 
-    private synchronized Transformer getTransfomerFor(String dataUri) {
-        if (data2Transformer.containsKey(dataUri)) {
-            return data2Transformer.get(dataUri);
+    private synchronized Transformer getTransfomerFor(String xsltUri) {
+        if (data2Transformer.containsKey(xsltUri)) {
+            return data2Transformer.get(xsltUri);
         }
-        final Transformer newTransformer = new EventsTransformer(dataEnricher, dataUri);
-        data2Transformer.put(dataUri, newTransformer);
+        final Transformer newTransformer = new EventsTransformer(processor, xsltUri);
+        data2Transformer.put(xsltUri, newTransformer);
         return newTransformer;
     }
     
