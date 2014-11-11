@@ -1,4 +1,4 @@
-package eu.fusepool.p3.events.transformer.test;
+package eu.fusepool.p3.xslt.transformer.test;
 
 import static org.junit.Assert.*;
 
@@ -26,8 +26,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.fusepool.p3.events.transformer.XsltProcessorImpl;
-import eu.fusepool.p3.events.transformer.XsltProcessor;
+import eu.fusepool.p3.xslt.transformer.XsltProcessor;
+import eu.fusepool.p3.xslt.transformer.XsltProcessorImpl;
 
 public class XsltProcessorImplTest {
 	

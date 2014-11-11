@@ -1,18 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.fusepoolp3</groupId>
-    <artifactId>p3-events-transformer</artifactId>
+    <artifactId>p3-xslt-transformer</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <name>Fusepool P3 Events Transformer</name>
+    <name>Fusepool P3 XSLT Transformer</name>
     <packaging>jar</packaging>
     <description>
-        The transformer collects data about events from different sources and makes it available as RDF. 
+        The XSLT transformer gets XML data and the url of a xslt template as input and returns the transformed RDF data. 
     </description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <main.class>eu.fusepool.p3.events.transformer.Main</main.class>
+        <main.class>eu.fusepool.p3.xslt.transformer.Main</main.class>
         <finalName>${project.artifactId}-${project.version}</finalName>
     </properties>
     <build>

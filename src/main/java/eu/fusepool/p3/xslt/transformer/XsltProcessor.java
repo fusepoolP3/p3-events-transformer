@@ -1,4 +1,4 @@
-package eu.fusepool.p3.events.transformer;
+package eu.fusepool.p3.xslt.transformer;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

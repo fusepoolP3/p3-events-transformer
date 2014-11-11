@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.fusepool.p3.events.transformer;
+package eu.fusepool.p3.xslt.transformer;
 
 import org.wymiwyg.commons.util.arguments.ArgumentsWithHelp;
 import org.wymiwyg.commons.util.arguments.CommandLine;

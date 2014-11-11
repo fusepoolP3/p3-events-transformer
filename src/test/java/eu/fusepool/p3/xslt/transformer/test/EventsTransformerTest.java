@@ -1,4 +1,4 @@
-package eu.fusepool.p3.events.transformer.test;
+package eu.fusepool.p3.xslt.transformer.test;
 
 import java.net.ServerSocket;
 import java.util.Iterator;
@@ -12,15 +12,19 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import com.jayway.restassured.RestAssured;
-import eu.fusepool.p3.events.transformer.EventsTransformerFactory;
+
 import eu.fusepool.p3.transformer.server.TransformerServer;
+
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import eu.fusepool.p3.transformer.client.Transformer;
 import eu.fusepool.p3.transformer.client.TransformerClientImpl;
 import eu.fusepool.p3.transformer.commons.Entity;
 import eu.fusepool.p3.transformer.commons.util.WritingEntity;
+import eu.fusepool.p3.xslt.transformer.EventsTransformerFactory;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

@@ -1,7 +1,7 @@
-Fusepool P3 Events Transformer
+Fusepool P3 XSLT Transformer
 ============================
 
-The transformer uses data about events from different sources and makes it available as RDF.
-A data set must be sent via HTTP POST to the transformer with the url of an XSLT file for its 
-transformation into RDF. The transformer will return the result RDF data to the client.
+The transformer gets xml data and the url of a xslt template as input to transform the data in RDF.
+An XML data set must be sent via HTTP POST to the transformer with the url of an XSLT file as parameter. 
+The transformer will return the result RDF data to the client.
 .
