@@ -16,8 +16,10 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.clerezza.rdf.core.Graph;
 import org.apache.clerezza.rdf.core.Triple;
+import org.apache.clerezza.rdf.core.TripleCollection;
 import org.apache.clerezza.rdf.core.serializedform.Parser;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
+import org.apache.clerezza.rdf.core.serializedform.UnsupportedFormatException;
 import org.apache.clerezza.rdf.ontologies.RDFS;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -51,5 +53,42 @@ public class XsltProcessorImplTest {
 		Assert.assertTrue(tripleIter.hasNext());
 		
 	}
+	
+	/**
+     * Prints an input stream..
+     * @param in
+     */
+    private void printIntupStream(InputStream in) {
+    	StringBuilder text = new StringBuilder();
+    	try {
+	        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+	        String line;
+	        while((line = reader.readLine()) != null){
+	            text.append(line + "\n");
+	        }	
+    	}
+    	catch(IOException ioe){
+    		ioe.printStackTrace();
+    	}
+    	
+      	System.out.println(text);
+    	
+    }
+    /**
+     * Prints a graph..
+     * @param graph
+     */
+    private void printTripleCollection(TripleCollection graph){
+    	if(graph != null & ! graph.isEmpty()) {
+	    	int graphSize = graph.size();
+	    	Iterator<Triple> graphIter = graph.filter(null, null, null);
+	    	while(graphIter.hasNext()){
+	    		log.debug(graphIter.next().toString());
+	    	}
+    	}
+    	else {
+    		log.debug("The graph doesn't exist or is empty");
+    	}
+    }
 
 }

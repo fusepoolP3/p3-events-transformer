@@ -12,7 +12,7 @@
 @prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
 @prefix geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt; .
 @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
-@prefix schema: &lt;http://schema.org/&gt;
+@prefix schema: &lt;http://schema.org/&gt; .
     <xsl:apply-templates select="events"/>
   </xsl:template>
  
@@ -24,11 +24,10 @@
              <xsl:if test="name/value[@xml:lang='en'] != ''">
             rdfs:label "<xsl:value-of select="name/value[@xml:lang='en']"/>"@en ;
             </xsl:if>
-            schema:description "<xsl:value-of select="shortDescription/value[@xml:lang='it']"/>"@it ; 
             schema:category "<xsl:value-of select="searchCategories/searchCategory/value[@xml:lang='it']"/>"@it ;
             schema:category "<xsl:value-of select="searchCategories/searchCategory/value[@xml:lang='en']"/>"@en ;
-            schema:startDate "<xsl:value-of select="startDate"/>" ;
-            schema:endDate "<xsl:value-of select="endDate"/>" ;
+            schema:startDate "<xsl:value-of select="startDate"/>"^^xsd:date ;
+            schema:endDate "<xsl:value-of select="endDate"/>"^^xsd:date ;
             schema:location &lt;urn:location:uuid:<xsl:value-of select="alfId"/>&gt; ;
             schema:organizer &lt;urn:organization:uuid:<xsl:value-of select="alfId"/>&gt; .
 &lt;urn:location:uuid:<xsl:value-of select="alfId"/>&gt; rdf:type schema:PostalAddress ;
