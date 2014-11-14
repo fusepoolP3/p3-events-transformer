@@ -24,6 +24,7 @@
              <xsl:if test="name/value[@xml:lang='en'] != ''">
             rdfs:label "<xsl:value-of select="name/value[@xml:lang='en']"/>"@en ;
             </xsl:if>
+            schema:description "<xsl:value-of select="shortDescription/value[@xml:lang='it']"/>"@it ;
             schema:category "<xsl:value-of select="searchCategories/searchCategory/value[@xml:lang='it']"/>"@it ;
             schema:category "<xsl:value-of select="searchCategories/searchCategory/value[@xml:lang='en']"/>"@en ;
             schema:startDate "<xsl:value-of select="startDate"/>"^^xsd:date ;
