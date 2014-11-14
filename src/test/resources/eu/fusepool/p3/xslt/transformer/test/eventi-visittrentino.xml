@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<events xsi:schemaLocation="http://ipsoft.it/xsd events-export.xsd" xmlns="http://ipsoft.it/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<events xsi:schemaLocation="http://ipsoft.it/xsd events-export.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <event>
         <alfId>1a99db4f-b410-47aa-aa84-5e037ff5da88</alfId>
         <languageData>
