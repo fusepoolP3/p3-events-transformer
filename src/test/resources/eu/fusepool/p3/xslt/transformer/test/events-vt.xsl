@@ -3,6 +3,8 @@
 
   <xsl:output method="text" encoding="UTF-8"/>
 
+  <xsl:strip-space elements="*"/>
+ 
   <xsl:template match="/">
 # RDF data transformed from the data set available at the url
 # http://www.visittrentino.it/media/eventi/eventi.xml
@@ -15,30 +17,40 @@
 @prefix schema: &lt;http://schema.org/&gt; .
     <xsl:apply-templates select="events"/>
   </xsl:template>
- 
-  <xsl:template match="events">
 
+  <xsl:template match="events">
+        <xsl:variable name="apos"><xsl:text>'</xsl:text></xsl:variable>
+        <xsl:variable name="double_quote"><xsl:text>"</xsl:text></xsl:variable>
        <xsl:for-each select="event">         
 &lt;urn:event:uuid:<xsl:value-of select="alfId"/>&gt; rdf:type schema:Event ;
-            rdfs:label "<xsl:value-of select="name/value[@xml:lang='it']"/>"@it ; 
+            <xsl:variable name="quotedlabel" select="name/value[@xml:lang='it']"/>
+            rdfs:label "<xsl:value-of select="translate($quotedlabel,$double_quote,$apos)" />"@it ; 
              <xsl:if test="name/value[@xml:lang='en'] != ''">
             rdfs:label "<xsl:value-of select="name/value[@xml:lang='en']"/>"@en ;
             </xsl:if>
-            schema:description "<xsl:value-of select="shortDescription/value[@xml:lang='it']"/>"@it ;
+            <xsl:variable name="quoted_description" select="shortDescription/value[@xml:lang='it']"/>
+            <xsl:variable name="nolinefeed_description" select="translate($quoted_description,'&#10;&#13;',' ')"/>
+            schema:description "<xsl:value-of select="translate($nolinefeed_description,$double_quote,$apos)"/>"@it ; 
             schema:category "<xsl:value-of select="searchCategories/searchCategory/value[@xml:lang='it']"/>"@it ;
             schema:category "<xsl:value-of select="searchCategories/searchCategory/value[@xml:lang='en']"/>"@en ;
+            <xsl:if test="startDate != ''">
             schema:startDate "<xsl:value-of select="startDate"/>"^^xsd:date ;
+            </xsl:if>
+             <xsl:if test="endDate != ''">
             schema:endDate "<xsl:value-of select="endDate"/>"^^xsd:date ;
+            </xsl:if>
             schema:location &lt;urn:location:uuid:<xsl:value-of select="alfId"/>&gt; ;
             schema:organizer &lt;urn:organization:uuid:<xsl:value-of select="alfId"/>&gt; .
 &lt;urn:location:uuid:<xsl:value-of select="alfId"/>&gt; rdf:type schema:PostalAddress ;
-            rdfs:label "<xsl:value-of select="eventLocation/value"/>" ;
+            <xsl:variable name="location" select="eventLocation/value" />
+            rdfs:label "<xsl:value-of select="translate($location,$double_quote,$apos)"/>" ;
             schema:addressLocality "<xsl:value-of select="location/place/value"/>" ;
             <xsl:if test="location/country/value != ''">
             schema:addressCountry "<xsl:value-of select="location/country/value"/>" ;
             </xsl:if>
             <xsl:if test="location/street/value != ''">
-            schema:streetAddress "<xsl:value-of select="location/street/value"/> <xsl:value-of select="location/number"/>" ;
+            <xsl:variable name="address" select="location/street/value"/>
+            schema:streetAddress "<xsl:value-of select="translate($address,$double_quote,$apos)"/> <xsl:value-of select="location/number"/>" ;
             </xsl:if>
             <xsl:if test="location/zipCode != ''">
             schema:postalCode "<xsl:value-of select="location/zipCode"/>" ;
@@ -46,8 +58,9 @@
             geo:lat "<xsl:value-of select="coordinates/latitude"/>"^^xsd:double ;
             geo:long  "<xsl:value-of select="coordinates/longitude"/>"^^xsd:double .
 &lt;urn:organization:uuid:<xsl:value-of select="alfId"/>&gt;  rdf:type schema:Organization ;
-            rdfs:label "<xsl:value-of select="info/companyName/value"/>" ;
-            schema:name "<xsl:value-of select="info/companyName/value"/>" ;
+            <xsl:variable name="organization_label" select="info/companyName/value"/>
+            rdfs:label "<xsl:value-of select="translate($organization_label,$double_quote,$apos)"/>" ;
+            schema:name "<xsl:value-of select="translate($organization_label,$double_quote,$apos)"/>" ;
             schema:telephone "<xsl:value-of select="contacts/phoneNumber1"/>" ;
             schema:email "<xsl:value-of select="contacts/mailInfo"/>" .
             

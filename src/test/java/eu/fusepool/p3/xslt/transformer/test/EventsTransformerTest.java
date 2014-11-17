@@ -59,9 +59,9 @@ public class EventsTransformerTest {
     private static final UriRef LAT = new UriRef("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
 	
 	// client data (xml)
-	final String CLIENT_XML_DATA = "foo.xml";
+	final String CLIENT_XML_DATA = "eventi-visittrentino.xml";
 	// data used by the mock server
-	final String MOCK_XSLT = "foo.xsl";
+	final String MOCK_XSLT = "events-vt.xsl";
 	
 	public static final String DATA_MIME_TYPE = "application/xml"; //MIME type of the xslt file fetched from the url provided by the client
 	

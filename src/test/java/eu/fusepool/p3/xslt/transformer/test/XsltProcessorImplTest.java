@@ -45,8 +45,8 @@ public class XsltProcessorImplTest {
 	@Test
 	public void testProcessTrentinoXml() throws TransformerConfigurationException, FileNotFoundException, 
 	                                  TransformerException, IOException {
-		InputStream xmlIn = getClass().getResourceAsStream("foo.xml");
-		String xslUrl = getClass().getResource("foo.xsl").getFile();
+		InputStream xmlIn = getClass().getResourceAsStream("eventi-visittrentino.xml");
+		String xslUrl = getClass().getResource("events-vt.xsl").getFile();
 		InputStream rdfIn = processor.processXml(xslUrl, xmlIn);
 		Graph graph = Parser.getInstance().parse(rdfIn, SupportedFormat.TURTLE);
 		Iterator<Triple> tripleIter = graph.filter(null, RDFS.label, null);
