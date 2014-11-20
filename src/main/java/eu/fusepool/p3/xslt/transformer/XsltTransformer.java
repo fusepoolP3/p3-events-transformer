@@ -38,9 +38,6 @@ import eu.fusepool.p3.transformer.commons.Entity;
  */
 class XsltTransformer implements SyncTransformer {
 
-	public static final String DATA_MIME_TYPE = "application/xml"; //MIME type of the data fetched from the url provided by the client
-	public static final String DATA_QUERY_PARAM = "data";
-	
     private static final Logger log = LoggerFactory.getLogger(XsltTransformer.class);
     
     final XsltProcessor processor; 
@@ -51,6 +48,9 @@ class XsltTransformer implements SyncTransformer {
     	this.xsltUrl = xsltUrl;
     	}
 
+    /**
+     * Set of client data formats supported.
+     */
     @Override
     public Set<MimeType> getSupportedInputFormats() {
         try {
@@ -62,6 +62,9 @@ class XsltTransformer implements SyncTransformer {
         }
     }
     
+    /**
+     * Set of transformer output data formats supported.
+     */
     @Override
     public Set<MimeType> getSupportedOutputFormats() {
         try {
@@ -85,13 +88,14 @@ class XsltTransformer implements SyncTransformer {
         InputStream xmlDataIn = entity.getData();
         
         // Fetch the xslt transformation from the url.
-    	// The xslt transformation url must be specified as a query parameters
+    	// The xslt transformation url is specified a query parameters with 'xslt' as parameter name
     	log.info("XSLT Url : " + xsltUrl);
     	if( xmlDataIn != null ){
     		// transform the xml data using the xslt fetched from the url
     		if( xsltUrl != null ){
     			try {
     			  InputStream transformedIn = processor.processXml(xsltUrl, xmlDataIn);
+    			  // The xslt must specify the MIME type of the output data setting the 'media-type' attribute of the 'output' element. 
     			  transformedEntity = new TransformedEntity(transformedIn,XsltUtil.getOutputMediaType(xsltUrl));
     			  
     			}
