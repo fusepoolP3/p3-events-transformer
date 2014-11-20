@@ -71,13 +71,10 @@ class EventsTransformer extends RdfGeneratingTransformer {
 
     @Override
     public Set<MimeType> getSupportedInputFormats() {
-        Parser parser = Parser.getInstance();
         try {
-            Set<MimeType> mimeSet = new HashSet<MimeType>();
-            for (String mediaFormat : parser.getSupportedFormats()) {           
-              mimeSet.add(new MimeType(mediaFormat));
-            }
-            return Collections.unmodifiableSet(mimeSet);
+          Set<MimeType> mimeSet = new HashSet<MimeType>();             
+          mimeSet.add(new MimeType("application/xml"));
+          return Collections.unmodifiableSet(mimeSet);
         } catch (MimeTypeParseException ex) {
             throw new RuntimeException(ex);
         }
