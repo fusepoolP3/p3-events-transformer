@@ -15,15 +15,10 @@
  */
 package eu.fusepool.p3.xslt.transformer;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.activation.MimeType;
@@ -31,40 +26,27 @@ import javax.activation.MimeTypeParseException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.clerezza.rdf.core.MGraph;
-import org.apache.clerezza.rdf.core.Triple;
-import org.apache.clerezza.rdf.core.TripleCollection;
-import org.apache.clerezza.rdf.core.UriRef;
-import org.apache.clerezza.rdf.core.impl.PlainLiteralImpl;
-import org.apache.clerezza.rdf.core.impl.SimpleMGraph;
-import org.apache.clerezza.rdf.core.impl.TripleImpl;
-import org.apache.clerezza.rdf.core.impl.TypedLiteralImpl;
-import org.apache.clerezza.rdf.core.serializedform.Parser;
-import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
-import org.apache.clerezza.rdf.ontologies.FOAF;
-import org.apache.clerezza.rdf.ontologies.RDFS;
-import org.apache.clerezza.rdf.ontologies.XSD;
-import org.apache.clerezza.rdf.utils.GraphNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.fusepool.p3.transformer.HttpRequestEntity;
-import eu.fusepool.p3.transformer.RdfGeneratingTransformer;
+import eu.fusepool.p3.transformer.SyncTransformer;
+import eu.fusepool.p3.transformer.commons.Entity;
 
 /**
  * A data transformer. The data set URI is specified at construction.
  */
-class EventsTransformer extends RdfGeneratingTransformer {
+class XsltTransformer implements SyncTransformer {
 
 	public static final String DATA_MIME_TYPE = "application/xml"; //MIME type of the data fetched from the url provided by the client
 	public static final String DATA_QUERY_PARAM = "data";
 	
-    private static final Logger log = LoggerFactory.getLogger(EventsTransformer.class);
+    private static final Logger log = LoggerFactory.getLogger(XsltTransformer.class);
     
     final XsltProcessor processor; 
     final String xsltUrl;
     
-    EventsTransformer(XsltProcessor processor, String xsltUrl) {
+    XsltTransformer(XsltProcessor processor, String xsltUrl) {
     	this.processor = processor;
     	this.xsltUrl = xsltUrl;
     	}
@@ -79,15 +61,25 @@ class EventsTransformer extends RdfGeneratingTransformer {
             throw new RuntimeException(ex);
         }
     }
+    
+    @Override
+    public Set<MimeType> getSupportedOutputFormats() {
+        try {
+          Set<MimeType> mimeSet = new HashSet<MimeType>();             
+          mimeSet.add(new MimeType("text/turtle"));
+          return Collections.unmodifiableSet(mimeSet);
+        } catch (MimeTypeParseException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
     /**
-     * Takes from the client an XML data set about events (places and dates)  a URL to dereference
-     * the XSLT rules to transform it in RDF.
-     * Returns the result RDF data    
+     * Takes a data set and an URL to dereference the XSLT rules for the transformation.
+     * Returns the result of the transformation.    
      */
     @Override
-    protected TripleCollection generateRdf(HttpRequestEntity entity) throws IOException {
-    	TripleCollection resultGraph = null;
+	public Entity transform(HttpRequestEntity entity) throws IOException {
+    	Entity transformedEntity = null;
         String mediaType = entity.getType().toString();
         log.debug(mediaType);
         InputStream xmlDataIn = entity.getData();
@@ -99,18 +91,9 @@ class EventsTransformer extends RdfGeneratingTransformer {
     		// transform the xml data using the xslt fetched from the url
     		if( xsltUrl != null ){
     			try {
-    			  InputStream rdfDataIn = processor.processXml(xsltUrl, xmlDataIn);
-    			  resultGraph = Parser.getInstance().parse(rdfDataIn, SupportedFormat.TURTLE);
-    			  try {
-    	    	        BufferedReader reader = new BufferedReader(new InputStreamReader(rdfDataIn));
-    	    	        String line;
-    	    	        while((line = reader.readLine()) != null){
-    	    	            System.out.println(line);
-    	    	        }	
-    	        	}
-    	        	catch(IOException ioe){
-    	        		throw new RuntimeException(ioe.getMessage());
-    	        	}
+    			  InputStream transformedIn = processor.processXml(xsltUrl, xmlDataIn);
+    			  transformedEntity = new TransformedEntity(transformedIn,XsltUtil.getOutputMediaType(xsltUrl));
+    			  
     			}
     			catch(TransformerConfigurationException tce){
     				throw new RuntimeException(tce.getMessage());
@@ -130,7 +113,7 @@ class EventsTransformer extends RdfGeneratingTransformer {
     	}
     	
         
-        return resultGraph;
+        return transformedEntity;
         
     }
   

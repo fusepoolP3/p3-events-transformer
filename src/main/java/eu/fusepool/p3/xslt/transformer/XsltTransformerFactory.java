@@ -17,13 +17,13 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author reto
  */
-public class EventsTransformerFactory implements TransformerFactory {
+public class XsltTransformerFactory implements TransformerFactory {
 
     private final Map<String, Transformer> data2Transformer = 
             new HashMap<>();
     private final XsltProcessor processor;
 
-    public EventsTransformerFactory() throws IOException {
+    public XsltTransformerFactory() throws IOException {
         this.processor = new XsltProcessorImpl();
     }
     
@@ -37,7 +37,7 @@ public class EventsTransformerFactory implements TransformerFactory {
         if (data2Transformer.containsKey(xsltUri)) {
             return data2Transformer.get(xsltUri);
         }
-        final Transformer newTransformer = new EventsTransformer(processor, xsltUri);
+        final Transformer newTransformer = new XsltTransformer(processor, xsltUri);
         data2Transformer.put(xsltUri, newTransformer);
         return newTransformer;
     }

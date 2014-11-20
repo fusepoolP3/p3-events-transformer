@@ -35,7 +35,7 @@ public class Main {
 
     private static void start(Arguments arguments) throws Exception {
         TransformerServer server = new TransformerServer(arguments.getPort(), false);        
-        server.start(new EventsTransformerFactory());       
+        server.start(new XsltTransformerFactory());       
         server.join();
     }
     

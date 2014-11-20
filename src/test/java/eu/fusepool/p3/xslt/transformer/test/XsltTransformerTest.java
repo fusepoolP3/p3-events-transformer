@@ -24,7 +24,7 @@ import eu.fusepool.p3.transformer.client.Transformer;
 import eu.fusepool.p3.transformer.client.TransformerClientImpl;
 import eu.fusepool.p3.transformer.commons.Entity;
 import eu.fusepool.p3.transformer.commons.util.WritingEntity;
-import eu.fusepool.p3.xslt.transformer.EventsTransformerFactory;
+import eu.fusepool.p3.xslt.transformer.XsltTransformerFactory;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -53,35 +53,35 @@ import org.apache.clerezza.rdf.utils.GraphNode;
 import org.junit.Rule;
 import org.slf4j.LoggerFactory;
 
-public class EventsTransformerTest {
+public class XsltTransformerTest {
 	
 	private static final UriRef LONG = new UriRef("http://www.w3.org/2003/01/geo/wgs84_pos#long");
     private static final UriRef LAT = new UriRef("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
 	
-	// client data (xml)
-	final String CLIENT_XML_DATA = "eventi-visittrentino.xml";
+	// client data 
+	final String CLIENT_DATA = "eventi-visittrentino.xml";
 	// data used by the mock server
 	final String MOCK_XSLT = "events-vt.xsl";
 	
-	public static final String DATA_MIME_TYPE = "application/xml"; //MIME type of the xslt file fetched from the url provided by the client
+	public static final String CLIENT_DATA_MIME_TYPE = "application/xml"; //MIME type of the data sent by the client
 	
-	final static String TRANSFORMER_MIME_TYPE = "text/turtle";
+	final static String TRANSFORMER_MIME_TYPE = "text/turtle"; // MIME type of the transformer output
 	
     private static MimeType transformerMimeType;
     private static MimeType clientDataMimeType;
     static {
         try {
         	transformerMimeType = new MimeType(TRANSFORMER_MIME_TYPE);
-        	clientDataMimeType = new MimeType(DATA_MIME_TYPE);
+        	clientDataMimeType = new MimeType(CLIENT_DATA_MIME_TYPE);
         } catch (MimeTypeParseException ex) {
-            Logger.getLogger(EventsTransformerTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(XsltTransformerTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
 	private static int mockPort = 0;
 	private int transformerServerPort = 0;
     private byte[] mockXslt;
-    private byte[] clientXmlData;
+    private byte[] clientData;
     private String transformerBaseUri;
 	
 	
@@ -95,7 +95,7 @@ public class EventsTransformerTest {
 	@Before
     public void setUp() throws Exception {
 		//load the client xml data
-		clientXmlData = IOUtils.toByteArray(getClass().getResourceAsStream(CLIENT_XML_DATA));
+		clientData = IOUtils.toByteArray(getClass().getResourceAsStream(CLIENT_DATA));
 		// load the xslt transformation
 		mockXslt = IOUtils.toByteArray(getClass().getResourceAsStream(MOCK_XSLT));
 		
@@ -104,38 +104,40 @@ public class EventsTransformerTest {
         transformerBaseUri = "http://localhost:" + transformerServerPort + "/";
         RestAssured.baseURI = transformerBaseUri;
         TransformerServer server = new TransformerServer(transformerServerPort, false);
-        server.start(new EventsTransformerFactory());
+        server.start(new XsltTransformerFactory());
     
 	}
 	
 	
 	@Rule
-    public WireMockRule wireMockRule = new WireMockRule(mockPort);
-    
-    @Test
-    public void testTurtleSupported()  throws MimeTypeParseException {
-        Transformer t = new TransformerClientImpl(RestAssured.baseURI);
-        Set<MimeType> types = t.getSupportedInputFormats();
-        Assert.assertTrue("No supported Output format", types.size() > 0);
-        boolean turtleFound = false;
-        for (MimeType mimeType : types) {
-            if (transformerMimeType.match(mimeType)) {
-                turtleFound = true;
-            }
-        }
-        Assert.assertTrue("None of the supported output formats is turtle", turtleFound);
-    }
-        
+    public WireMockRule wireMockRule = new WireMockRule(mockPort);    
+	/**
+	 * Tests the data format set in the transformer
+	 * @throws MimeTypeParseException
+	 */
+	@Test
+	public void testMediaTypeSupported() throws MimeTypeParseException {
+	   Transformer t = new TransformerClientImpl(RestAssured.baseURI);
+	   Set<MimeType> types = t.getSupportedInputFormats();
+	   Assert.assertTrue("No supported Output format", types.size() > 0);
+	   boolean clientDataMimeTypeFound = false;
+	   for (MimeType mimeType : types) {
+	     if (clientDataMimeType.match(mimeType)) {
+	    	 clientDataMimeTypeFound = true;
+	     }
+	   }
+	   Assert.assertTrue("None of the supported output formats is the same as the client data MIME type", clientDataMimeTypeFound);
+	}
 
     /**
-     * The transformer receives data and a url from the client, fetches the data set from the url, applies a transformation
-     * and then check if the transformation is in the result graph.
+     * The transformer receives data and a url from the client, fetches the xslt from the url, applies the transformation
+     * and then check if the transformation is compatible with the expected result.
      * @throws Exception
      */
 	@Test
     public void testTransformation() throws Exception {
 	    // Set up a service in the mock server to respond to a get request that must be sent by the transformer
-		// on behalf of its client to fetch the xslt.
+		// on behalf of its client to fetch the xslt. The xslt MIME type is application/xml
         stubFor(get(urlEqualTo("/xslt/" + MOCK_XSLT))
                 .willReturn(aResponse()
                     .withStatus(HttpStatus.SC_OK)
@@ -159,7 +161,7 @@ public class EventsTransformerTest {
 
                 @Override
                 public void writeData(OutputStream out) throws IOException {
-                    out.write(clientXmlData);
+                    out.write(clientData);
                 }
             }, transformerMimeType);
 
