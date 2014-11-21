@@ -13,11 +13,12 @@ import eu.fusepool.p3.transformer.commons.util.InputStreamEntity;
 public class TransformedEntity extends InputStreamEntity {
 	
 	private InputStream dataIn = null;
-	private String mediaType ;
+	private String mediaType = "application/xml"; // default MIME type
 
 	public TransformedEntity(InputStream is, String mediaType){
 		this.dataIn = is;
-		this.mediaType = mediaType;
+		if(mediaType != null && ! "".equals(mediaType))
+		   this.mediaType = mediaType;
 	}
 	
 	@Override

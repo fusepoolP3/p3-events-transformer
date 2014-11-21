@@ -70,6 +70,7 @@ class XsltTransformer implements SyncTransformer {
         try {
           Set<MimeType> mimeSet = new HashSet<MimeType>();             
           mimeSet.add(new MimeType("text/turtle"));
+          mimeSet.add(new MimeType("application/xml"));
           return Collections.unmodifiableSet(mimeSet);
         } catch (MimeTypeParseException ex) {
             throw new RuntimeException(ex);
@@ -96,6 +97,7 @@ class XsltTransformer implements SyncTransformer {
     			try {
     			  InputStream transformedIn = processor.processXml(xsltUrl, xmlDataIn);
     			  // The xslt must specify the MIME type of the output data setting the 'media-type' attribute of the 'output' element. 
+    			  // A default application/xml MIME type is assumed.
     			  transformedEntity = new TransformedEntity(transformedIn,XsltUtil.getOutputMediaType(xsltUrl));
     			  
     			}
