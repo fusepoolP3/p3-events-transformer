@@ -15,7 +15,7 @@ Start the component with
 
 Some xslt files are bundled with the source code to run test in src/test/resources. The corresponding xslt transformations
 are available in the same folder and in the project repository on Github. The xslt url must be sent as a query parameter with 
-'xslt' as the parameter name. As an example we use a foo.xml file with an element
+'xslt' as the parameter name. As an example we use a foo.xml file with just an element
 
     <?xml version="1.0"?>
     <doc>Monte Bondone Hotel</doc>
@@ -36,22 +36,14 @@ and an xslt file, foo.xsl, that transforms the xml into RDF/TURTLE
       
     </xsl:stylesheet>
 
-A test can be done with curl. If the xslt file is in a local folder (e.g. /home/user/ ) run the command 
+The output format in the xslt should always be specified as in the example. A test can be done with curl. If the xslt file is in a local folder (e.g. /home/user/ ) run the command 
 
     curl -i -X POST -H "Content-Type: application/xml" -T foo.xml http://localhost:7100?xslt=file:///home/user/foo.xsl
 
-If the xslt can be put in a web server, just use its http url in place of the file url. 
-The command starts an asynchronous task and the server sends the location header where the result will be made available
-to the client
+If the xslt can be put in a web server, just use its http url in place of the file url. The xslt transformation is assumed to be synchronous by default and the result is sent to the client as soon as the transformation is done. In the example the result will be 
 
-    HTTP/1.1 100 Continue
+    @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+    @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
     
-    HTTP/1.1 202 Accepted
-    Date: Tue, 18 Nov 2014 09:26:32 GMT
-    Location: /job/19714db2-221e-48e3-813b-74d5b001acd1
-    Transfer-Encoding: chunked
-    Server: Jetty(9.2.0.RC0)
+    <http://example.org/res1> rdfs:label "Monte Bondone Hotel" .
 
-In order to retrieve the result the client has to send an HTTP GET  request to the server 
-
-    curl http://localhost:7100/job/19714db2-221e-48e3-813b-74d5b001acd1 

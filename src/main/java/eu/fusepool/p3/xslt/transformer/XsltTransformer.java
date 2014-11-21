@@ -125,8 +125,8 @@ class XsltTransformer implements SyncTransformer {
   
     @Override
     public boolean isLongRunning() {
-        // downloading the dataset can be time consuming
-        return true;
+        // the xslt transformation takes usually a short time. 
+        return false;
     }
 
 }
