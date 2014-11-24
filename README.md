@@ -5,6 +5,8 @@ The transformer takes as input xml data and the url of a xslt template and trans
 The xml data set must be sent to the transformer via HTTP POST with the url of the XSLT file as parameter. 
 The transformer will return the result RDF data to the client.
 
+[![Build Status](https://travis-ci.org/fusepoolP3/p3-xslt-transformer.svg)](https://travis-ci.org/fusepoolP3/p3-xslt-transformer)
+
 Compile the Maven project running the command
 
     mvn install
