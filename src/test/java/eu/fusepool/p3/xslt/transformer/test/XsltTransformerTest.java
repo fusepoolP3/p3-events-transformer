@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Set;
 import java.util.logging.Level;
@@ -112,12 +113,14 @@ public class XsltTransformerTest {
 	@Rule
     public WireMockRule wireMockRule = new WireMockRule(mockPort);    
 	/**
-	 * Tests the data format set in the transformer
+	 * Tests the input data format set in the transformer in order to accept client data.
+	 * The output format is set in the xslt.
 	 * @throws MimeTypeParseException
+	 * @throws UnsupportedEncodingException 
 	 */
 	@Test
-	public void testMediaTypeSupported() throws MimeTypeParseException {
-	   Transformer t = new TransformerClientImpl(RestAssured.baseURI);
+	public void testMediaTypeSupported() throws MimeTypeParseException, UnsupportedEncodingException {
+	   Transformer t = new TransformerClientImpl(setUpMockServer());
 	   Set<MimeType> types = t.getSupportedInputFormats();
 	   Assert.assertTrue("No supported Output format", types.size() > 0);
 	   boolean clientDataMimeTypeFound = false;
@@ -136,20 +139,7 @@ public class XsltTransformerTest {
      */
 	@Test
     public void testTransformation() throws Exception {
-	    // Set up a service in the mock server to respond to a get request that must be sent by the transformer
-		// on behalf of its client to fetch the xslt. The xslt MIME type is application/xml
-        stubFor(get(urlEqualTo("/xslt/" + MOCK_XSLT))
-                .willReturn(aResponse()
-                    .withStatus(HttpStatus.SC_OK)
-                    .withHeader("Content-Type", "application/xml")
-                    .withBody(mockXslt)));
-        
-        // prepare the client HTTP POST message with the xml data and the url where to dereference the xslt 
-        String xsltUrl = "http://localhost:" + mockPort + "/xslt/" + MOCK_XSLT ;
-        // the client sends a request to the transformer with the url of the events data to be fetched
-        String queryString = "xslt=" + URLEncoder.encode(xsltUrl, "UTF-8");
-        String clientRequestUrl = RestAssured.baseURI+"?"+queryString;
-        Transformer t = new TransformerClientImpl(clientRequestUrl);
+        Transformer t = new TransformerClientImpl(setUpMockServer());
         // the transformer fetches the xslt from the mock server, applies its transformation and sends the RDF result to the client
         {
             Entity response = t.transform(new WritingEntity() {
@@ -178,6 +168,23 @@ public class XsltTransformerTest {
         }
                 
 	    
+	}
+	/**
+	 * Set up a service in the mock server to respond to a get request that must be sent by the transformer
+	 * on behalf of its client to fetch the xslt. The xslt MIME type is application/xml.
+	 * Returns the xslt url.
+	 */
+	private String setUpMockServer() throws UnsupportedEncodingException{
+		stubFor(get(urlEqualTo("/xslt/" + MOCK_XSLT))
+                .willReturn(aResponse()
+                    .withStatus(HttpStatus.SC_OK)
+                    .withHeader("Content-Type", "application/xml")
+                    .withBody(mockXslt)));
+	   // prepare the client HTTP POST message with the xml data and the url where to dereference the xslt 
+       String xsltUrl = "http://localhost:" + mockPort + "/xslt/" + MOCK_XSLT ;
+       // the client sends a request to the transformer with the url of the events data to be fetched
+       String queryString = "xslt=" + URLEncoder.encode(xsltUrl, "UTF-8");
+       return RestAssured.baseURI+"?"+queryString;
 	}
     
 	

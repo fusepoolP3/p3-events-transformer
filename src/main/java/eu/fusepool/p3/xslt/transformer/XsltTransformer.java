@@ -42,10 +42,12 @@ class XsltTransformer implements SyncTransformer {
     
     final XsltProcessor processor; 
     final String xsltUrl;
+    final String xsltOutputMediaType;
     
     XsltTransformer(XsltProcessor processor, String xsltUrl) {
     	this.processor = processor;
     	this.xsltUrl = xsltUrl;
+    	this.xsltOutputMediaType = getXsltOutputMediaType(xsltUrl);
     	}
 
     /**
@@ -69,8 +71,7 @@ class XsltTransformer implements SyncTransformer {
     public Set<MimeType> getSupportedOutputFormats() {
         try {
           Set<MimeType> mimeSet = new HashSet<MimeType>();             
-          mimeSet.add(new MimeType("text/turtle"));
-          mimeSet.add(new MimeType("application/xml"));
+          mimeSet.add(new MimeType(xsltOutputMediaType));
           return Collections.unmodifiableSet(mimeSet);
         } catch (MimeTypeParseException ex) {
             throw new RuntimeException(ex);
@@ -98,7 +99,7 @@ class XsltTransformer implements SyncTransformer {
     			  InputStream transformedIn = processor.processXml(xsltUrl, xmlDataIn);
     			  // The xslt must specify the MIME type of the output data setting the 'media-type' attribute of the 'output' element. 
     			  // A default application/xml MIME type is assumed.
-    			  transformedEntity = new TransformedEntity(transformedIn,XsltUtil.getOutputMediaType(xsltUrl));
+    			  transformedEntity = new TransformedEntity(transformedIn, xsltOutputMediaType);
     			  
     			}
     			catch(TransformerConfigurationException tce){
@@ -121,6 +122,16 @@ class XsltTransformer implements SyncTransformer {
         
         return transformedEntity;
         
+    }
+    /**
+     * Gets the MIME type of the xslt output as stated in the 'media-type' attribute
+     * of the xsl:output element.
+     * @param xsltUrl
+     * @return Returns the media-type attribute value of the xslt or an empty string if the attribute value is missing
+     */
+    private String getXsltOutputMediaType(String xsltUrl){
+    	
+    	return XsltUtil.getOutputMediaType(xsltUrl);
     }
   
     @Override

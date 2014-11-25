@@ -15,7 +15,7 @@ public class XsltUtilTest {
 	}
 
 	@Test
-	public void test() {
+	public void testXsltOutputMediaType() {
 		String xslName = "https://raw.githubusercontent.com/fusepoolP3/p3-xslt-transformer/master/src/test/resources/eu/fusepool/p3/xslt/transformer/test/foo.xsl";
 		String mediaType = XsltUtil.getOutputMediaType(xslName);
 		Assert.assertTrue("text/turtle".equals(mediaType));
