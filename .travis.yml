@@ -2,9 +2,11 @@ language: java
 before_install: mvn install -DskipTests=true -DfinalName=p3-xslt-transformer-$TRAVIS_TAG
 deploy:
   provider: releases
-  api_key:
-    secure: ktoTJUpqffcubSuUfVGYLuH/i3gIEDVtQIjaEZZChFMB6iK6Kddgd8ajYqQARw9oy7PAsGzl1N9BwIOXbODZu832wbIBK4+D1EDTtz8hjEDYZbHZe9zdAQI99IZXeMk7yAk7jHC7H0LhXOkDJ5RuPUauk1RnjwohhcbuYvH4umE=
+  user: luigiselmi
+  secure: F55dLqM8kk+Do8vGqwnmkpLMgcY5CZ4MFAxULWbUFTMMDYXD2Vz+rxjdtqNjqT2nJErosfcoE4OLkAB4jPLBeJaHdrg0WPue5xGqiyNkxlnWh611BQvddm7TD58OI/0tjlHfEDNSW/ngJqADs5z1TQL7xPhPfUY9K83q24grSek=
   file: target/p3-xslt-transformer-$TRAVIS_TAG-jar-with-dependencies.jar
+  skip_cleanup: true
   on:
+    repo: fusepoolP3/p3-xslt-transformer
     tags: true
     all_branches: true
