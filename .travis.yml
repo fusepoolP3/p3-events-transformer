@@ -7,3 +7,6 @@ deploy:
   file: target/p3-xslt-transformer-$TRAVIS_TAG-jar-with-dependencies.jar
   on:
     repo: fusepoolP3/p3-xslt-transformer
+    tags: true
+    all_branches: true
+
