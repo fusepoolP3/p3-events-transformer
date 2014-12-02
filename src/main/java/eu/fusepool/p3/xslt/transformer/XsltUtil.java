@@ -31,7 +31,7 @@ public class XsltUtil {
 	public static String getOutputMimeType(String xslName){
 		String mimeType = "";
 		String mediaType = "";
-		String outputMethod = "";
+		String method = "";
 		getDocument(xslName);
 		NodeList nList = xsl.getElementsByTagName("xsl:output");
 		for (int i = 0; i < nList.getLength(); i++) {
@@ -39,15 +39,15 @@ public class XsltUtil {
 			if (outputNode.getNodeType() == Node.ELEMENT_NODE) {
 			   Element outputElement = (Element) outputNode;
 			   mediaType = outputElement.getAttribute("media-type");
-			   outputMethod = outputElement.getAttribute("method");
+			   method = outputElement.getAttribute("method");
 			}
 		}
 		
 		if("".equals(mediaType)){
 			
-			mimeType = ("text".equals(outputMethod)) ? "text/plain" : 
-	              ("xml".equals(outputMethod)) ? "application/xml" : 
-	              ("html".equals(outputMethod)) ? "text/html" : "" ;  
+			mimeType = ("text".equals(method)) ? "text/plain" : 
+	              ("xml".equals(method)) ? "application/xml" : 
+	              ("html".equals(method)) ? "text/html" : "" ;  
 			
 		}
 		else 
