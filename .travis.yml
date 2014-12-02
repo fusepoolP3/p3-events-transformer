@@ -3,7 +3,8 @@ before_install: mvn install -DskipTests=true -DfinalName=p3-xslt-transformer-$TR
 deploy:
   provider: releases
   user: luigiselmi
-  secure: F55dLqM8kk+Do8vGqwnmkpLMgcY5CZ4MFAxULWbUFTMMDYXD2Vz+rxjdtqNjqT2nJErosfcoE4OLkAB4jPLBeJaHdrg0WPue5xGqiyNkxlnWh611BQvddm7TD58OI/0tjlHfEDNSW/ngJqADs5z1TQL7xPhPfUY9K83q24grSek=
+  password:
+    secure: F55dLqM8kk+Do8vGqwnmkpLMgcY5CZ4MFAxULWbUFTMMDYXD2Vz+rxjdtqNjqT2nJErosfcoE4OLkAB4jPLBeJaHdrg0WPue5xGqiyNkxlnWh611BQvddm7TD58OI/0tjlHfEDNSW/ngJqADs5z1TQL7xPhPfUY9K83q24grSek=
   file: target/p3-xslt-transformer-$TRAVIS_TAG-jar-with-dependencies.jar
   skip_cleanup: true
   on:
