@@ -17,13 +17,21 @@ import org.xml.sax.SAXException;
 public class XsltUtil {
 	
 	private static Document xsl = null;
+	
 	/**
-	 * Returns the MIME type of the XSLT transformation output.
+	 * Returns the MIME type of the XSLT transformation output taken from the "media-type" attribute of the xsl:output element.
+	 * If the "media-type" attribute is not used it takes the "method" attribute of the same element. 
+	 * The following mappings between the "method" attribute values and MIME types are used
+	 * text -> text/plain
+	 * xml  -> application/xml
+	 * html -> text/html
 	 * @param xslName
 	 * @return
 	 */
-	public static String getOutputMediaType(String xslName){
+	public static String getOutputMimeType(String xslName){
+		String mimeType = "";
 		String mediaType = "";
+		String outputMethod = "";
 		getDocument(xslName);
 		NodeList nList = xsl.getElementsByTagName("xsl:output");
 		for (int i = 0; i < nList.getLength(); i++) {
@@ -31,10 +39,22 @@ public class XsltUtil {
 			if (outputNode.getNodeType() == Node.ELEMENT_NODE) {
 			   Element outputElement = (Element) outputNode;
 			   mediaType = outputElement.getAttribute("media-type");
+			   outputMethod = outputElement.getAttribute("method");
 			}
 		}
 		
-		return mediaType;
+		if("".equals(mediaType)){
+			
+			mimeType = ("text".equals(outputMethod)) ? "text/plain" : 
+	              ("xml".equals(outputMethod)) ? "application/xml" : 
+	              ("html".equals(outputMethod)) ? "text/html" : "" ;  
+			
+		}
+		else 
+			mimeType = mediaType;
+		
+		
+		return mimeType;
 	}
 	
 	private static void getDocument(String xslName){
