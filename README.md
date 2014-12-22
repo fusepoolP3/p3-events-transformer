@@ -3,7 +3,7 @@ Fusepool P3 XSLT Transformer
 
 The transformer takes as input xml data and the url of a xslt template and transforms the data in RDF.
 The xml data set must be sent to the transformer via HTTP POST with the url of the XSLT file as parameter. 
-The transformer will return the result RDF data to the client.
+The transformer will return the result RDF data to the client. This transformer is used within [FP-209](https://fusepool.atlassian.net/browse/FP-209) to transform XML data about events into RDF.
 
 [![Build Status](https://travis-ci.org/fusepoolP3/p3-xslt-transformer.svg)](https://travis-ci.org/fusepoolP3/p3-xslt-transformer)
 
