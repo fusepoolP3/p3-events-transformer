@@ -21,28 +21,34 @@
 
   <xsl:template match="osm">
        <xsl:for-each select="way">
-
-        <xsl:if test="@id > 0 ">
-          <xsl:if test="tag[@k='highway']">
-            <xsl:if test="tag[@k='name']/@v != ''">
+         <xsl:variable name="id" select="@id"/>
+         <xsl:variable name="tagHighway" select="tag[@k='highway']"/>
+         <xsl:variable name="tagName" select="tag[@k='name']"/>
+        <xsl:if test="$id > 0 and $tagHighway and $tagName/@v != ''">
               &lt;urn:osm:way:uuid:<xsl:value-of select="@id"/>&gt; rdf:type schema:PostalAddress ;
-                schema:streetAddress "<xsl:value-of select="tag[@k='name']/@v"/>" ;
-                ngeo:geometry &lt;urn:osm:way:geometry:uuid:<xsl:value-of select="@id"/>&gt; .
-
-                &lt;urn:osm:way:geometry:uuid:<xsl:value-of select="@id"/>&gt; ogc:asWKT "LINESTRING(
-                <xsl:for-each select="nd">
-                  <xsl:variable name="node_ref" select="@ref"/>
-                  <xsl:for-each select="//node[@id=$node_ref]">
-                    <xsl:value-of select="@lon"/><xsl:text> </xsl:text><xsl:value-of select="@lat"/>,
+                schema:streetAddress "<xsl:value-of select="$tagName/@v"/>" ;
+                ngeo:geometry &lt;urn:osm:way:geometry:uuid:<xsl:value-of select="$id"/>&gt; .
+                <xsl:variable name="raw_linestring" >
+                  <xsl:for-each select="nd">
+                    <xsl:variable name="node_ref" select="@ref"/>
+                    <xsl:variable name="lon" select="/osm/node[@id=$node_ref]/@lon"/>
+                    <xsl:variable name="lat" select="/osm/node[@id=$node_ref]/@lat"/>
+                    <xsl:value-of select="$lon"/><xsl:text>_</xsl:text><xsl:value-of select="$lat"/>,
                   </xsl:for-each>
-                </xsl:for-each>)"
-            </xsl:if>
-          </xsl:if>
+                </xsl:variable>
+              <xsl:variable name="nowhitespace_linestring" select="translate($raw_linestring,'&#10;&#32;','')"/>
+              <xsl:variable name="nounderscore_linestring" select="translate($nowhitespace_linestring,'&#95;',' ')"/>
+              <xsl:variable name="linestring" select="substring($nounderscore_linestring,1,string-length($nounderscore_linestring)-1)"/>
+              &lt;urn:osm:way:geometry:uuid:<xsl:value-of select="$id"/>&gt; ogc:asWKT "LINESTRING(<xsl:value-of select="$linestring"/>) ;
         </xsl:if>
 
 
        </xsl:for-each>
 
   </xsl:template>
+
+
+
+
 
 </xsl:stylesheet>
