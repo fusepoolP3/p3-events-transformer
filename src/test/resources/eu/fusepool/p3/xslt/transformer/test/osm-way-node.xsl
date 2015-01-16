@@ -13,7 +13,7 @@
 @prefix geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt; .
 @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
 @prefix schema: &lt;http://schema.org/&gt; .
-@prefix ngeo: &lt;http://geovocab.org/geometry#&gt; .
+#@prefix ngeo: &lt;http://geovocab.org/geometry#&gt; .
 @prefix ogc: &lt;http://www.opengis.net/ont/geosparql#&gt; .
 
     <xsl:apply-templates select="osm"/>
@@ -27,7 +27,7 @@
         <xsl:if test="$id > 0 and $tagHighway and $tagName/@v != ''">
               &lt;urn:osm:way:uuid:<xsl:value-of select="@id"/>&gt; rdf:type schema:PostalAddress ;
                 schema:streetAddress "<xsl:value-of select="$tagName/@v"/>" ;
-                ngeo:geometry &lt;urn:osm:way:geometry:uuid:<xsl:value-of select="$id"/>&gt; .
+                ogc:geometry &lt;urn:osm:way:geometry:uuid:<xsl:value-of select="$id"/>&gt; .
                 <xsl:variable name="raw_linestring" >
                   <xsl:for-each select="nd">
                     <xsl:variable name="node_ref" select="@ref"/>
@@ -39,7 +39,7 @@
               <xsl:variable name="nowhitespace_linestring" select="translate($raw_linestring,'&#10;&#32;','')"/>
               <xsl:variable name="nounderscore_linestring" select="translate($nowhitespace_linestring,'&#95;',' ')"/>
               <xsl:variable name="linestring" select="substring($nounderscore_linestring,1,string-length($nounderscore_linestring)-1)"/>
-              &lt;urn:osm:way:geometry:uuid:<xsl:value-of select="$id"/>&gt; ogc:asWKT "LINESTRING(<xsl:value-of select="$linestring"/>) ;
+              &lt;urn:osm:way:geometry:uuid:<xsl:value-of select="$id"/>&gt; ogc:asWKT "LineString((<xsl:value-of select="$linestring"/>))" .
         </xsl:if>
 
 
