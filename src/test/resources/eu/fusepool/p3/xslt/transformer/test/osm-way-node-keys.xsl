@@ -13,7 +13,6 @@
 @prefix geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt; .
 @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
 @prefix schema: &lt;http://schema.org/&gt; .
-#@prefix ngeo: &lt;http://geovocab.org/geometry#&gt; .
 @prefix ogc: &lt;http://www.opengis.net/ont/geosparql#&gt; .
 
     <xsl:apply-templates select="osm"/>
@@ -22,13 +21,16 @@
   <xsl:key name="nodes" match="node" use="@id"/>
 
   <xsl:template match="osm">
+    <xsl:variable name="double_quote"><xsl:text>"</xsl:text></xsl:variable>
+    <xsl:variable name="apos"><xsl:text>'</xsl:text></xsl:variable>
        <xsl:for-each select="way">
          <xsl:variable name="id" select="@id"/>
          <xsl:variable name="tagHighway" select="tag[@k='highway']"/>
          <xsl:variable name="tagName" select="tag[@k='name']"/>
         <xsl:if test="$id > 0 and $tagHighway and $tagName/@v != ''">
               &lt;urn:osm:way:uuid:<xsl:value-of select="@id"/>&gt; rdf:type schema:PostalAddress ;
-                schema:streetAddress "<xsl:value-of select="$tagName/@v"/>" ;
+              <xsl:variable name="street" select="$tagName/@v"/>
+                schema:streetAddress "<xsl:value-of select="translate($street,$double_quote,$apos)"/>" ;            
                 ogc:geometry &lt;urn:osm:way:geometry:uuid:<xsl:value-of select="$id"/>&gt; .
                 <xsl:variable name="raw_linestring" >
                   <xsl:for-each select="nd">
