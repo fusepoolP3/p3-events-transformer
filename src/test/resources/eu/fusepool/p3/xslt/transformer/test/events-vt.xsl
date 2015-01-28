@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xpath-default-namespace="http://ipsoft.it/xsd" version="1.0">
 
   <xsl:output method="text" media-type="text/turtle" encoding="UTF-8"/>
 
@@ -8,7 +8,7 @@
   <xsl:template match="/">
 # RDF data transformed from the data set available at the url
 # http://www.visittrentino.it/media/eventi/eventi.xml
-# xslt version 1.0.0-20141114
+# xslt version 1.0.0-20150128_2
 
 @prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
 @prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
@@ -26,7 +26,8 @@
             <xsl:variable name="quotedlabel" select="name/value[@xml:lang='it']"/>
             rdfs:label "<xsl:value-of select="translate($quotedlabel,$double_quote,$apos)" />"@it ;
              <xsl:if test="name/value[@xml:lang='en'] != ''">
-            rdfs:label "<xsl:value-of select="name/value[@xml:lang='en']"/>"@en ;
+                <xsl:variable name="quoted_en_label" select="name/value[@xml:lang='en']"/>
+            rdfs:label "<xsl:value-of select="translate($quoted_en_label,$double_quote,$apos)"/>"@en ;
             </xsl:if>
             <xsl:variable name="quoted_description" select="shortDescription/value[@xml:lang='it']"/>
             <xsl:variable name="nolinefeed_description" select="translate($quoted_description,'&#10;&#13;',' ')"/>
@@ -47,7 +48,8 @@
 &lt;urn:location:uuid:<xsl:value-of select="alfId"/>&gt; rdf:type schema:PostalAddress ;
             <xsl:variable name="location" select="eventLocation/value" />
             rdfs:label "<xsl:value-of select="translate($location,$double_quote,$apos)"/>" ;
-            schema:addressLocality "<xsl:value-of select="location/place/value"/>" ;
+            <xsl:variable name="place" select="location/place/value" />
+            schema:addressLocality "<xsl:value-of select="translate($place,$double_quote,$apos)"/>" ;
             <xsl:if test="location/country/value != ''">
             schema:addressCountry "<xsl:value-of select="location/country/value"/>" ;
             </xsl:if>
