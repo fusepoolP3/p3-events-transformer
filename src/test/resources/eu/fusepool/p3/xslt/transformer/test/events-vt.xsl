@@ -4,7 +4,7 @@
   <xsl:output method="text" media-type="text/turtle" encoding="UTF-8"/>
 
   <xsl:strip-space elements="*"/>
- 
+
   <xsl:template match="/">
 # RDF data transformed from the data set available at the url
 # http://www.visittrentino.it/media/eventi/eventi.xml
@@ -21,17 +21,20 @@
   <xsl:template match="events">
         <xsl:variable name="apos"><xsl:text>'</xsl:text></xsl:variable>
         <xsl:variable name="double_quote"><xsl:text>"</xsl:text></xsl:variable>
-       <xsl:for-each select="event">         
+       <xsl:for-each select="event">
 &lt;urn:event:uuid:<xsl:value-of select="alfId"/>&gt; rdf:type schema:Event ;
             <xsl:variable name="quotedlabel" select="name/value[@xml:lang='it']"/>
-            rdfs:label "<xsl:value-of select="translate($quotedlabel,$double_quote,$apos)" />"@it ; 
+            rdfs:label "<xsl:value-of select="translate($quotedlabel,$double_quote,$apos)" />"@it ;
              <xsl:if test="name/value[@xml:lang='en'] != ''">
             rdfs:label "<xsl:value-of select="name/value[@xml:lang='en']"/>"@en ;
             </xsl:if>
             <xsl:variable name="quoted_description" select="shortDescription/value[@xml:lang='it']"/>
             <xsl:variable name="nolinefeed_description" select="translate($quoted_description,'&#10;&#13;',' ')"/>
-            schema:description "<xsl:value-of select="translate($nolinefeed_description,$double_quote,$apos)"/>"@it ; 
+            schema:description "<xsl:value-of select="translate($nolinefeed_description,$double_quote,$apos)"/>"@it ;
             schema:category "<xsl:value-of select="searchCategories/searchCategory/value[@xml:lang='it']"/>"@it ;
+            <xsl:variable name="quoted_en_description" select="shortDescription/value[@xml:lang='en']"/>
+            <xsl:variable name="nolinefeed_en_description" select="translate($quoted_en_description,'&#10;&#13;',' ')"/>
+            schema:description "<xsl:value-of select="translate($nolinefeed_en_description,$double_quote,$apos)"/>"@en ;
             schema:category "<xsl:value-of select="searchCategories/searchCategory/value[@xml:lang='en']"/>"@en ;
             <xsl:if test="startDate != ''">
             schema:startDate "<xsl:value-of select="startDate"/>"^^xsd:date ;
@@ -63,9 +66,9 @@
             schema:name "<xsl:value-of select="translate($organization_label,$double_quote,$apos)"/>" ;
             schema:telephone "<xsl:value-of select="contacts/phoneNumber1"/>" ;
             schema:email "<xsl:value-of select="contacts/mailInfo"/>" .
-            
+
        </xsl:for-each>
-    
+
   </xsl:template>
 
 </xsl:stylesheet>
