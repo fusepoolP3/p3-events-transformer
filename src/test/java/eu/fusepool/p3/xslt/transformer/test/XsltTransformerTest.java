@@ -60,7 +60,7 @@ public class XsltTransformerTest {
     private static final UriRef LAT = new UriRef("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
 	
 	// client data 
-	final String CLIENT_DATA = "eventi-visittrentino.xml";
+	final String CLIENT_DATA = "eventi.xml";
 	// data used by the mock server
 	final String MOCK_XSLT = "events-vt.xsl";
 	
