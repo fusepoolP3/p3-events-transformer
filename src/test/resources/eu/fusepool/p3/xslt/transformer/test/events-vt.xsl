@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xpath-default-namespace="http://ipsoft.it/xsd" version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xpath-default-namespace="http://ipsoft.it/xsd" version="2.0">
 
   <xsl:output method="text" media-type="text/turtle" encoding="UTF-8"/>
 
@@ -8,7 +8,7 @@
   <xsl:template match="/">
 # RDF data transformed from the data set available at the url
 # http://www.visittrentino.it/media/eventi/eventi.xml
-# xslt version 1.0.0-20150128_2
+# xslt version 1.0.0-20150204_1
 
 @prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
 @prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
@@ -29,6 +29,29 @@
                 <xsl:variable name="quoted_en_label" select="name/value[@xml:lang='en']"/>
             rdfs:label "<xsl:value-of select="translate($quoted_en_label,$double_quote,$apos)"/>"@en ;
             </xsl:if>
+            <xsl:variable name="description_it" select="description/value[@xml:lang='it']"/>
+            <xsl:variable name="stripHTML"><![CDATA[<\s*\w.*?>|<\s*/\s*\w\s*.*?>]]></xsl:variable>
+            <xsl:if test="$description_it != ''">
+              <xsl:variable name="stripped_description_it">
+            <xsl:analyze-string select="$description_it" regex="{$stripHTML}">
+              <xsl:non-matching-substring><xsl:value-of select="."/></xsl:non-matching-substring>
+            </xsl:analyze-string>
+            </xsl:variable>
+            <xsl:variable name="nolinefeed_stripped_description_it" select="translate($stripped_description_it,'&#10;&#13;',' ')"/>
+          rdfs:comment "<xsl:value-of select="translate($nolinefeed_stripped_description_it,$double_quote,$apos)"/>"@it ;
+          </xsl:if>
+          <xsl:variable name="description_en" select="description/value[@xml:lang='en']"/>
+          <xsl:variable name="stripHTML"><![CDATA[<\s*\w.*?>|<\s*/\s*\w\s*.*?>]]></xsl:variable>
+          <xsl:if test="$description_en != ''">
+            <xsl:variable name="stripped_description_en">
+              <xsl:analyze-string select="$description_en" regex="{$stripHTML}">
+                <xsl:non-matching-substring><xsl:value-of select="."/></xsl:non-matching-substring>
+              </xsl:analyze-string>
+            </xsl:variable>
+            <xsl:variable name="nolinefeed_stripped_description_en" select="translate($stripped_description_en,'&#10;&#13;',' ')"/>
+            rdfs:comment "<xsl:value-of select="translate($nolinefeed_stripped_description_en,$double_quote,$apos)"/>"@en ;
+          </xsl:if>
+
             <xsl:variable name="quoted_description" select="shortDescription/value[@xml:lang='it']"/>
             <xsl:variable name="nolinefeed_description" select="translate($quoted_description,'&#10;&#13;',' ')"/>
             schema:description "<xsl:value-of select="translate($nolinefeed_description,$double_quote,$apos)"/>"@it ;
@@ -46,15 +69,15 @@
             schema:location &lt;urn:location:uuid:<xsl:value-of select="alfId"/>&gt; ;
             schema:organizer &lt;urn:organization:uuid:<xsl:value-of select="alfId"/>&gt; .
 &lt;urn:location:uuid:<xsl:value-of select="alfId"/>&gt; rdf:type schema:PostalAddress ;
-            <xsl:variable name="location" select="eventLocation/value" />
+            <xsl:variable name="location" select="eventLocation/value[@xml:lang='it']" />
             rdfs:label "<xsl:value-of select="translate($location,$double_quote,$apos)"/>" ;
-            <xsl:variable name="place" select="location/place/value" />
+            <xsl:variable name="place" select="location/place/value[@xml:lang='it']" />
             schema:addressLocality "<xsl:value-of select="translate($place,$double_quote,$apos)"/>" ;
             <xsl:if test="location/country/value != ''">
             schema:addressCountry "<xsl:value-of select="location/country/value"/>" ;
             </xsl:if>
             <xsl:if test="location/street/value != ''">
-            <xsl:variable name="address" select="location/street/value"/>
+            <xsl:variable name="address" select="location/street/value[@xml:lang='it']"/>
             schema:streetAddress "<xsl:value-of select="translate($address,$double_quote,$apos)"/> <xsl:value-of select="location/number"/>" ;
             </xsl:if>
             <xsl:if test="location/zipCode != ''">
@@ -63,7 +86,7 @@
             geo:lat "<xsl:value-of select="coordinates/latitude"/>"^^xsd:double ;
             geo:long  "<xsl:value-of select="coordinates/longitude"/>"^^xsd:double .
 &lt;urn:organization:uuid:<xsl:value-of select="alfId"/>&gt;  rdf:type schema:Organization ;
-            <xsl:variable name="organization_label" select="info/companyName/value"/>
+            <xsl:variable name="organization_label" select="info/companyName/value[@xml:lang='it']"/>
             rdfs:label "<xsl:value-of select="translate($organization_label,$double_quote,$apos)"/>" ;
             schema:name "<xsl:value-of select="translate($organization_label,$double_quote,$apos)"/>" ;
             schema:telephone "<xsl:value-of select="contacts/phoneNumber1"/>" ;
