@@ -8,7 +8,7 @@
   <xsl:template match="/">
 # RDF data transformed from the data set available at the url
 # http://www.visittrentino.it/media/eventi/eventi.xml
-# xslt version 1.0.0-20150204_2
+# xslt version 1.0.0-20150206_1
 
 @prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
 @prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
@@ -67,23 +67,27 @@
             </xsl:if>
             schema:location &lt;urn:location:uuid:<xsl:value-of select="alfId"/>&gt; ;
             schema:organizer &lt;urn:organization:uuid:<xsl:value-of select="alfId"/>&gt; .
-&lt;urn:location:uuid:<xsl:value-of select="alfId"/>&gt; rdf:type schema:PostalAddress ;
+&lt;urn:location:uuid:<xsl:value-of select="alfId"/>&gt; rdf:type schema:Place ;
             <xsl:variable name="location" select="eventLocation/value[@xml:lang='it']" />
             rdfs:label "<xsl:value-of select="translate($location,$double_quote,$apos)"/>" ;
+            geo:lat "<xsl:value-of select="coordinates/latitude"/>"^^xsd:double ;
+            geo:long  "<xsl:value-of select="coordinates/longitude"/>"^^xsd:double ;
+            schema:event &lt;urn:event:uuid:<xsl:value-of select="alfId"/>&gt; ;
+            schema:address &lt;urn:address:uuid:<xsl:value-of select="alfId"/>&gt; .
+&lt;urn:address:uuid:<xsl:value-of select="alfId"/>&gt; rdf:type schema:PostalAddress ;
             <xsl:variable name="place" select="location/place/value[@xml:lang='it']" />
-            schema:addressLocality "<xsl:value-of select="translate($place,$double_quote,$apos)"/>" ;
+            schema:addressLocality "<xsl:value-of select="translate($place,$double_quote,$apos)"/>" .
             <xsl:if test="location/country/value != ''">
-            schema:addressCountry "<xsl:value-of select="location/country/value"/>" ;
+&lt;urn:address:uuid:<xsl:value-of select="alfId"/>&gt; schema:addressCountry "<xsl:value-of select="location/country/value[@xml:lang='it']"/>"@it .
+&lt;urn:address:uuid:<xsl:value-of select="alfId"/>&gt; schema:addressCountry "<xsl:value-of select="location/country/value[@xml:lang='en']"/>"@en .
             </xsl:if>
             <xsl:if test="location/street/value != ''">
             <xsl:variable name="address" select="location/street/value[@xml:lang='it']"/>
-            schema:streetAddress "<xsl:value-of select="translate($address,$double_quote,$apos)"/> <xsl:value-of select="location/number"/>" ;
+&lt;urn:address:uuid:<xsl:value-of select="alfId"/>&gt; schema:streetAddress "<xsl:value-of select="translate($address,$double_quote,$apos)"/> <xsl:value-of select="location/number"/>" .
             </xsl:if>
             <xsl:if test="location/zipCode != ''">
-            schema:postalCode "<xsl:value-of select="location/zipCode"/>" ;
+&lt;urn:address:uuid:<xsl:value-of select="alfId"/>&gt; schema:postalCode "<xsl:value-of select="location/zipCode"/>" .
             </xsl:if>
-            geo:lat "<xsl:value-of select="coordinates/latitude"/>"^^xsd:double ;
-            geo:long  "<xsl:value-of select="coordinates/longitude"/>"^^xsd:double .
 &lt;urn:organization:uuid:<xsl:value-of select="alfId"/>&gt;  rdf:type schema:Organization ;
             <xsl:variable name="organization_label" select="info/companyName/value[@xml:lang='it']"/>
             rdfs:label "<xsl:value-of select="translate($organization_label,$double_quote,$apos)"/>" ;
