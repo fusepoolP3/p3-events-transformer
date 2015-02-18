@@ -26,7 +26,7 @@ import org.xml.sax.InputSource;
 
 public class XsltProcessorImpl implements XsltProcessor {
 	@Override
-	public InputStream processXml(String xsltUrl, InputStream xmlDataIn) throws TransformerException, TransformerConfigurationException, 
+	public InputStream processXml(String xsltUrl, InputStream xmlDataIn, String locationHeader) throws TransformerException, TransformerConfigurationException, 
 	FileNotFoundException, IOException {
 		
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -34,6 +34,10 @@ public class XsltProcessorImpl implements XsltProcessor {
 		TransformerFactory tFactory = TransformerFactory.newInstance();
 		
 		Transformer transformer = tFactory.newTransformer(new StreamSource( xsltUrl ));
+		
+		if (locationHeader != null && ! locationHeader.equals("")) {		
+		    transformer.setParameter("locationHeader", locationHeader);
+		}
 		
 		transformer.transform(new StreamSource( xmlDataIn ), new StreamResult( outputStream ));
 		

@@ -1,14 +1,11 @@
 package eu.fusepool.p3.xslt.transformer.test;
 
-import static org.junit.Assert.*;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
+import java.net.ServerSocket;
 import java.util.Iterator;
 
 import javax.xml.transform.TransformerConfigurationException;
@@ -19,9 +16,7 @@ import org.apache.clerezza.rdf.core.Triple;
 import org.apache.clerezza.rdf.core.TripleCollection;
 import org.apache.clerezza.rdf.core.serializedform.Parser;
 import org.apache.clerezza.rdf.core.serializedform.SupportedFormat;
-import org.apache.clerezza.rdf.core.serializedform.UnsupportedFormatException;
 import org.apache.clerezza.rdf.ontologies.RDFS;
-import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +31,7 @@ public class XsltProcessorImplTest {
 	XsltProcessor processor;
 	
 	private static final Logger log = LoggerFactory.getLogger(XsltProcessorImplTest.class);
+	private String locationHeader = "http://localhost:7002"; // location header sent by the client to be used as base uri in triples
 
 	@Before
 	public void setUp() throws Exception {
@@ -47,7 +43,7 @@ public class XsltProcessorImplTest {
 	                                  TransformerException, IOException {
 		InputStream xmlIn = getClass().getResourceAsStream("eventi.xml");
 		String xslUrl = getClass().getResource("events-vt.xsl").getFile();
-		InputStream rdfIn = processor.processXml(xslUrl, xmlIn);
+		InputStream rdfIn = processor.processXml(xslUrl, xmlIn, locationHeader);
 		Graph graph = Parser.getInstance().parse(rdfIn, SupportedFormat.TURTLE);
 		Iterator<Triple> tripleIter = graph.filter(null, RDFS.label, null);
 		Assert.assertTrue(tripleIter.hasNext());
@@ -90,5 +86,7 @@ public class XsltProcessorImplTest {
     		log.debug("The graph doesn't exist or is empty");
     	}
     }
+    
+    
 
 }

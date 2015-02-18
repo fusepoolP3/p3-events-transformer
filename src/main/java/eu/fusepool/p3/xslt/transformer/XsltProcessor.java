@@ -9,7 +9,7 @@ import javax.xml.transform.TransformerException;
 
 public interface XsltProcessor {
 
-	public InputStream processXml(String xsltUrl, InputStream xmlDataIn) throws TransformerException, TransformerConfigurationException, 
+	public InputStream processXml(String xsltUrl, InputStream xmlDataIn, String localioHeader) throws TransformerException, TransformerConfigurationException, 
 	FileNotFoundException, IOException;
 	
 }

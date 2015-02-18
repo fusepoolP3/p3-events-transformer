@@ -86,6 +86,10 @@ class XsltTransformer implements SyncTransformer {
 	public Entity transform(HttpRequestEntity entity) throws IOException {
     	Entity transformedEntity = null;
         String mediaType = entity.getType().toString();
+        String contentLocation = null;
+        if ( entity.getContentLocation() != null ) {
+            contentLocation = entity.getContentLocation().toString();
+        }
         log.debug(mediaType);
         InputStream xmlDataIn = entity.getData();
         
@@ -96,7 +100,7 @@ class XsltTransformer implements SyncTransformer {
     		// transform the xml data using the xslt fetched from the url
     		if( xsltUrl != null ){
     			try {
-    			  InputStream transformedIn = processor.processXml(xsltUrl, xmlDataIn);
+    			  InputStream transformedIn = processor.processXml(xsltUrl, xmlDataIn, contentLocation);
     			  // The xslt must specify the MIME type of the output data setting the 'media-type' attribute of the 'output' element. 
     			  // A default application/xml MIME type is assumed.
     			  transformedEntity = new TransformedEntity(transformedIn, xsltOutputMimeType);
