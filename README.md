@@ -40,7 +40,7 @@ and an xslt file, foo.xsl, that transforms the xml into RDF/TURTLE
 
 The output format in the xslt should always be specified as in the example. A test can be done with curl. If the xslt file is in a local folder (e.g. /home/user/ ) run the command 
 
-    curl -i -X POST -H "Content-Type: application/xml" -T foo.xml http://localhost:7100?xslt=file:///home/user/foo.xsl
+    curl -i -X POST -H "Content-Type: application/xml" -d @foo.xml http://localhost:7100/?xslt=file:///home/user/foo.xsl
 
 If the xslt can be put in a web server, just use its http url in place of the file url. The xslt transformation is assumed to be synchronous by default and the result is sent to the client as soon as the transformation is done. In the example the result will be 
 
