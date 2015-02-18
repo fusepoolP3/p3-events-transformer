@@ -42,6 +42,10 @@ The output format in the xslt should always be specified as in the example. A te
 
     curl -i -X POST -H "Content-Type: application/xml" -d @foo.xml http://localhost:7100/?xslt=file:///home/user/foo.xsl
 
+A "Content-Location" header can be passed to the transformer to be used as a parameter in the xsl transformation. The parameter name to use in the xsl is "locationHeader". This parameter can be used as a base for URIs. The curl command will be
+
+    curl -i -X POST -H "Content-Type: application/xml" -H "Content-Location: http://example.org" -d @foo.xml http://localhost:7100/?xslt=file:///home/user/foo.xsl 
+
 If the xslt can be put in a web server, just use its http url in place of the file url. The xslt transformation is assumed to be synchronous by default and the result is sent to the client as soon as the transformation is done. In the example the result will be 
 
     @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
