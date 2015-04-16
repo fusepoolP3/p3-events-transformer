@@ -6,7 +6,7 @@ The xml data set must be sent to the transformer via HTTP POST with the url of t
 The transformer will return the result RDF data to the client. This transformer is used within [FP-209](https://fusepool.atlassian.net/browse/FP-209) to transform XML data about events into RDF.
 
 [![Build Status](https://travis-ci.org/fusepoolP3/p3-xslt-transformer.svg)](https://travis-ci.org/fusepoolP3/p3-xslt-transformer)
-
+## Compiling and Running
 Compile the Maven project running the command
 
     mvn install
@@ -15,6 +15,7 @@ Start the component with
 
     mvn exec:java
 
+## Usage
 Some xslt files are bundled with the source code to run test in src/test/resources. The corresponding xslt transformations
 are available in the same folder and in the project repository on Github. The xslt url must be sent as a query parameter with 
 'xslt' as the parameter name. As an example we use a foo.xml file with just an element
