@@ -1,4 +1,4 @@
-Fusepool P3 XSLT Transformer
+XSLT Transformer
 ============================
 
 The transformer takes as input xml data and the url of a xslt template and transforms the data in RDF.
