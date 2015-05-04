@@ -27,7 +27,7 @@ public interface Arguments extends ArgumentsWithHelp {
     
 
     @CommandLine(longName = "port", shortName = {"P"}, required = false,
-            defaultValue = "8187",
+            defaultValue = "8307",
             description = "The port on which the transformer shall listen")
     public int getPort();
     
