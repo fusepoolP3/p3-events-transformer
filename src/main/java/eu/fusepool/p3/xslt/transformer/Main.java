@@ -16,7 +16,7 @@
 package eu.fusepool.p3.xslt.transformer;
 
 
-import eu.fusepool.p3.transformer.sample.Arguments;
+import eu.fusepool.p3.xslt.transformer.Arguments;
 import eu.fusepool.p3.transformer.server.TransformerServer;
 
 import org.wymiwyg.commons.util.arguments.ArgumentHandler;
