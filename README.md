@@ -6,6 +6,16 @@ The xml data set must be sent to the transformer via HTTP POST with the url of t
 The transformer will return the result RDF data to the client. This transformer is used within [FP-209](https://fusepool.atlassian.net/browse/FP-209) to transform XML data about events into RDF.
 
 [![Build Status](https://travis-ci.org/fusepoolP3/p3-xslt-transformer.svg)](https://travis-ci.org/fusepoolP3/p3-xslt-transformer)
+
+## Try it out
+The transformer can be started using the latest release that can be downloaded from the releases section. The executable jar file contains all the necessary dependencies. To start an instance of the transformer factory run the command
+
+      java -jar p3-xslt-transformer-v1.0.0-20150505-jar-with-dependencies.jar
+    
+An instance of the XSLT transformer factory will be listening at the default port 8307. The port number can be changed, for example to use port number 7100, as follows
+
+     java -jar p3-xslt-transformer-v1.0.0-20150505-jar-with-dependencies.jar -P 7100
+  
 ## Compiling and Running
 Compile the Maven project running the command
 
@@ -14,6 +24,8 @@ Compile the Maven project running the command
 Start the component with 
 
     mvn exec:java
+    
+The default port number used by the transformer when started with Maven is set in the pom.xml file. 
 
 ## Usage
 Some xslt files are bundled with the source code to run test in src/test/resources. The corresponding xslt transformations
