@@ -64,8 +64,7 @@ public class XsltTransformerTest {
 	// data used by the mock server
 	final String MOCK_XSLT = "events-vt.xsl";
 	
-	public static final String CLIENT_DATA_MIME_TYPE = "application/xml"; //MIME type of the data sent by the client
-	
+	public static final String CLIENT_DATA_MIME_TYPE = "application/xml"; //MIME type of the data sent by the client	
 	final static String TRANSFORMER_MIME_TYPE = "text/turtle"; // MIME type of the transformer output
 	
     private static MimeType transformerMimeType;
@@ -112,6 +111,8 @@ public class XsltTransformerTest {
 	
 	@Rule
     public WireMockRule wireMockRule = new WireMockRule(mockPort);    
+	
+	
 	/**
 	 * Tests the input data format set in the transformer in order to accept client data.
 	 * The output format is set in the xslt.
@@ -169,6 +170,7 @@ public class XsltTransformerTest {
                 
 	    
 	}
+	
 	/**
 	 * Set up a service in the mock server to respond to a get request that must be sent by the transformer
 	 * on behalf of its client to fetch the xslt. The xslt MIME type is application/xml.
