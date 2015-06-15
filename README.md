@@ -1,11 +1,9 @@
-XSLT Transformer
-============================
+XSLT Transformer [![Build Status](https://travis-ci.org/fusepoolP3/p3-xslt-transformer.svg)](https://travis-ci.org/fusepoolP3/p3-xslt-transformer)
+================
 
 The transformer takes as input xml data and the url of a xslt template and transforms the data in RDF.
 The xml data set must be sent to the transformer via HTTP POST with the url of the XSLT file as parameter. 
 The transformer will return the result RDF data to the client. This transformer is used within [FP-209](https://fusepool.atlassian.net/browse/FP-209) to transform XML data about events into RDF.
-
-[![Build Status](https://travis-ci.org/fusepoolP3/p3-xslt-transformer.svg)](https://travis-ci.org/fusepoolP3/p3-xslt-transformer)
 
 ## Try it out
 The transformer can be started using the latest release that can be downloaded from the releases section. The executable jar file contains all the necessary dependencies. To start an instance of the transformer factory run the command
